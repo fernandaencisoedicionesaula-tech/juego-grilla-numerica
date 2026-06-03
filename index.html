@@ -363,7 +363,7 @@ body{padding:6px}
 <button class="challenge-btn active" data-challenge="3">
 <span class="btn-num">3</span>
 <span class="btn-info">
-<span class="btn-text">DESAFÍO 3</span>
+<span class="btn-text">DESCUBRE EL NÚMERO QUE FALTA</span>
 <span class="btn-desc">El reto del detective</span>
 </span>
 </button>
@@ -565,7 +565,7 @@ currentChallenge=0;stars=0;gameActive=true;totalTimeLeft=TOTAL_TIME;
 document.getElementById('star-count').textContent='0';
 document.getElementById('game-card-content').style.display='block';
 document.getElementById('end-screen').classList.add('hidden');
-document.getElementById('game-badge').textContent=type===1?'DESAFÍO DE LA GRILLA NUMÉRICA':type===2?'DESCUBRE EL PATRÓN':'DESAFÍO 3';
+document.getElementById('game-badge').textContent=type===1?'DESAFÍO DE LA GRILLA NUMÉRICA':type===2?'DESCUBRE EL PATRÓN':'DESCUBRE EL NÚMERO QUE FALTA';
 try{SoundFX.play('start')}catch(e){};
 totalTimerInterval=setInterval(updateTimers,1000);
 loadChallenge()
