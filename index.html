@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Detective de los Números Perdidos</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+font-family:'Fredoka',sans-serif;
+min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;
+background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+padding:20px;overflow-x:hidden;-webkit-tap-highlight-color:transparent;overscroll-behavior:none
+}
+#app{position:relative;min-height:100vh;width:100%}
+
+/* ===== MENU ===== */
+#menu-screen{
+position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+background:url('interfase/menú principal fondo.jpg') center/cover no-repeat;
+z-index:10;transition:opacity .4s ease,transform .4s ease
+}
+#menu-screen.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
+#menu-screen::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.55);pointer-events:none}
+.floating-q{
+position:absolute;font-size:4rem;font-weight:800;color:rgba(255,255,255,0.04);
+pointer-events:none;user-select:none;animation:floatQ 8s ease-in-out infinite
+}
+.floating-q:nth-child(1){top:8%;left:5%;animation-delay:0s}
+.floating-q:nth-child(2){top:15%;right:8%;animation-delay:2s;font-size:3rem}
+.floating-q:nth-child(3){bottom:20%;left:12%;animation-delay:4s;font-size:5rem}
+.floating-q:nth-child(4){bottom:10%;right:5%;animation-delay:6s;font-size:3.5rem}
+@keyframes floatQ{
+0%,100%{transform:translateY(0) rotate(0deg)}
+25%{transform:translateY(-20px) rotate(5deg)}
+50%{transform:translateY(-10px) rotate(-3deg)}
+75%{transform:translateY(-25px) rotate(4deg)}
+}
+.menu-container{
+position:relative;z-index:1;background:rgba(255,255,255,0.06);
+backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+border-radius:32px;padding:36px 44px;max-width:520px;width:90%;text-align:center;
+border:1px solid rgba(255,255,255,0.1);box-shadow:0 25px 80px rgba(0,0,0,0.6);
+animation:menuIn .8s ease-out
+}
+@keyframes menuIn{0%{opacity:0;transform:translateY(40px) scale(0.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.menu-title{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;letter-spacing:1px}
+.menu-subtitle{font-size:0.9rem;color:rgba(255,255,255,0.6);margin-top:6px;font-weight:400;letter-spacing:2px}
+.divider-line{width:60px;height:3px;background:linear-gradient(90deg,#f59e0b,transparent);border-radius:2px;margin:14px auto}
+.robot-container{margin:10px auto;width:110px;height:110px;animation:robotBob 3s ease-in-out infinite}
+@keyframes robotBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.robot-container img{width:100%;height:100%;display:block;object-fit:contain}
+.challenges{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.challenge-btn{
+display:flex;align-items:center;gap:14px;width:100%;padding:14px 18px;
+border:none;border-radius:16px;cursor:pointer;font-family:'Fredoka',sans-serif;
+font-size:1.1rem;font-weight:700;text-align:left;transition:all .25s;
+position:relative;overflow:hidden;text-decoration:none;color:white;
+-webkit-tap-highlight-color:transparent;touch-action:manipulation
+}
+.challenge-btn.active{background:linear-gradient(135deg,#4f46e5,#6366f1);box-shadow:0 4px 20px rgba(99,102,241,0.4)}
+.challenge-btn.active:hover{transform:translateX(6px) translateY(-2px);box-shadow:0 8px 30px rgba(99,102,241,0.5)}
+.challenge-btn.active:active{transform:translateX(2px) translateY(0)}
+.challenge-btn.active::after{content:'▶';position:absolute;right:18px;font-size:1rem;opacity:0.6}
+.challenge-btn.locked{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.35);cursor:not-allowed;border:1px solid rgba(255,255,255,0.06)}
+.challenge-btn.locked .btn-num{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.3)}
+.challenge-btn .btn-num{
+display:flex;align-items:center;justify-content:center;width:42px;height:42px;
+border-radius:12px;font-size:1.2rem;font-weight:800;flex-shrink:0;
+background:rgba(255,255,255,0.15);transition:all .25s
+}
+.challenge-btn.active .btn-num{background:rgba(255,255,255,0.2)}
+.challenge-btn .btn-info{flex:1;min-width:0}
+.challenge-btn .btn-text{display:block;font-size:1.1rem;font-weight:700;letter-spacing:0.5px}
+.challenge-btn .btn-desc{display:block;font-size:0.7rem;font-weight:400;opacity:0.6;margin-top:1px;letter-spacing:0.5px}
+.challenge-btn.locked .btn-text::after{content:' 🔒';font-size:0.9rem}
+.challenge-btn.locked .btn-desc{color:rgba(255,255,255,0.3)}
+.menu-footer-text{font-size:0.7rem;color:rgba(255,255,255,0.2);margin-top:18px;letter-spacing:1px}
+
+/* ===== GAME (shared) ===== */
+#game-screen{
+display:none;align-items:center;justify-content:center;
+position:fixed;inset:0;z-index:5;
+background:url('interfase/menú principal fondo.jpg') center/cover no-repeat
+}
+#game-screen::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.55);pointer-events:none}
+#game-screen.visible{display:flex}
+.game-card{
+background:white;border-radius:24px;padding:16px 24px 20px;
+max-width:640px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.5);
+text-align:center;position:relative;z-index:1;color:#1e1e2f
+}
+.game-header{
+display:flex;justify-content:space-between;align-items:center;
+margin-bottom:6px;flex-wrap:wrap;gap:6px
+}
+.header-left{display:flex;align-items:center;gap:8px}
+.back-btn{
+display:inline-flex;align-items:center;gap:5px;
+background:linear-gradient(135deg,#4f46e5,#6366f1);
+border:none;font-size:0.95rem;cursor:pointer;padding:7px 12px;
+border-radius:10px;transition:all .2s;color:white;
+font-family:'Fredoka',sans-serif;font-weight:700;
+box-shadow:0 3px 10px rgba(79,70,229,0.3);white-space:nowrap;
+-webkit-tap-highlight-color:transparent;touch-action:manipulation
+}
+.back-btn:hover{background:linear-gradient(135deg,#4338ca,#4f46e5);transform:translateX(-2px);box-shadow:0 5px 16px rgba(79,70,229,0.4)}
+.game-title{font-size:1rem;font-weight:700;color:#1e1e2f;text-align:left}
+.game-level-badge{
+display:inline-block;background:linear-gradient(135deg,#4f46e5,#6366f1);
+color:white;padding:1px 10px;border-radius:10px;font-size:0.65rem;font-weight:700;letter-spacing:1px;margin-left:4px
+}
+.stars-display{
+font-size:1.2rem;background:#fef3c7;padding:3px 10px;border-radius:14px;
+display:flex;align-items:center;gap:3px;font-weight:700;color:#d97706;
+border:2px solid #fbbf24;min-width:50px;justify-content:center
+}
+
+/* Timer */
+.timer-section{background:#f8fafc;border-radius:12px;padding:8px 12px;margin:6px 0 10px}
+.total-timer-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.timer-icon{font-size:1rem}
+.total-time-text{font-size:0.9rem;font-weight:700;color:#1e1e2f}
+.timer-bar-track{flex:1;height:8px;background:#e5e7eb;border-radius:8px;overflow:hidden}
+.timer-bar-fill{height:100%;width:0%;border-radius:8px;background:linear-gradient(90deg,#6366f1,#818cf8);transition:width .6s ease}
+.challenge-progress{font-size:0.8rem;font-weight:700;color:#6366f1;min-width:44px;text-align:right}
+.q-timer-row{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.q-timer-text{font-size:0.95rem;font-weight:700;color:#6366f1;transition:color .3s;font-variant-numeric:tabular-nums}
+.q-timer-text.urgent{color:#ef4444;animation:qPulse .5s ease-in-out infinite}
+@keyframes qPulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.q-timer-label{font-size:0.75rem;color:#9ca3af;font-weight:600}
+.challenge-badge{
+display:inline-block;padding:2px 10px;border-radius:8px;
+font-size:0.7rem;font-weight:700;letter-spacing:0.5px;margin-bottom:6px
+}
+.challenge-badge.c1{background:#ede9fe;color:#4f46e5}
+.challenge-badge.c2{background:#dbeafe;color:#2563eb}
+
+/* ===== CHALLENGE 1 - Grid ===== */
+#grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;max-width:400px;margin:8px auto}
+.cell{
+aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#4f46e5,#6366f1);
+color:white;border-radius:12px;transition:all .3s;user-select:none;
+box-shadow:0 3px 8px rgba(79,70,229,0.3);touch-action:manipulation
+}
+.cell.hidden-cell{
+background:linear-gradient(135deg,#f59e0b,#fbbf24);
+box-shadow:0 3px 12px rgba(245,158,11,0.5);
+animation:cellPulse 1.2s ease-in-out infinite;font-size:1.8rem
+}
+.cell.revealed{background:linear-gradient(135deg,#10b981,#34d399);box-shadow:0 3px 12px rgba(16,185,129,0.4);animation:revealPop .6s cubic-bezier(0.34,1.56,0.64,1) forwards}
+@keyframes cellPulse{0%,100%{transform:scale(1);box-shadow:0 3px 12px rgba(245,158,11,0.4)}50%{transform:scale(1.06);box-shadow:0 6px 20px rgba(245,158,11,0.6)}}
+@keyframes revealPop{0%{transform:scale(0.3) rotate(-10deg);opacity:0}50%{transform:scale(1.15) rotate(3deg)}100%{transform:scale(1) rotate(0deg);opacity:1}}
+
+/* ===== CHALLENGE 2 - Sequence ===== */
+#sequence{display:flex;gap:10px;justify-content:center;margin:12px auto;flex-wrap:wrap}
+.seq-cell{
+width:68px;height:68px;display:flex;align-items:center;justify-content:center;
+font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,#2563eb,#3b82f6);
+color:white;border-radius:14px;box-shadow:0 3px 8px rgba(37,99,235,0.3)
+}
+.seq-cell.hidden{
+background:linear-gradient(135deg,#f59e0b,#fbbf24);
+box-shadow:0 3px 12px rgba(245,158,11,0.5);
+animation:cellPulse 1.2s ease-in-out infinite;font-size:1.7rem
+}
+.seq-cell.revealed{background:linear-gradient(135deg,#10b981,#34d399);box-shadow:0 3px 12px rgba(16,185,129,0.4);animation:revealPop .6s cubic-bezier(0.34,1.56,0.64,1) forwards}
+.seq-arrow{
+display:flex;align-items:center;font-size:1.5rem;color:#9ca3af;font-weight:700
+}
+.seq-label{font-size:0.8rem;color:#6b7280;font-weight:600;margin-bottom:2px;letter-spacing:1px}
+
+/* Shared game elements */
+#question{font-size:1.35rem;font-weight:700;color:#1e1e2f;margin:8px 0;letter-spacing:1px}
+#options{display:flex;gap:12px;justify-content:center;margin:10px 0;flex-wrap:wrap}
+.option-btn{
+font-family:'Fredoka',sans-serif;font-size:1.5rem;font-weight:700;
+padding:12px 26px;border:none;border-radius:14px;cursor:pointer;
+transition:all .2s;min-width:90px;color:white;
+background:linear-gradient(135deg,#6366f1,#818cf8);
+box-shadow:0 4px 14px rgba(99,102,241,0.4);letter-spacing:0.5px;
+-webkit-tap-highlight-color:transparent;touch-action:manipulation
+}
+.option-btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 6px 24px rgba(99,102,241,0.5)}
+.option-btn:active:not(:disabled){transform:translateY(0)}
+.option-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
+.option-btn.correct{background:linear-gradient(135deg,#10b981,#34d399)!important;box-shadow:0 4px 14px rgba(16,185,129,0.4)!important;transform:scale(1.05)}
+.option-btn.wrong{background:linear-gradient(135deg,#ef4444,#f87171)!important;box-shadow:0 4px 14px rgba(239,68,68,0.4)!important;animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+#hint{min-height:32px;font-size:0.9rem;color:#d97706;font-weight:600;margin:2px 0;display:flex;align-items:center;justify-content:center;gap:6px}
+#result{min-height:40px;font-size:1.25rem;font-weight:700;margin:4px 0;display:flex;align-items:center;justify-content:center;gap:8px}
+#result.success{color:#10b981;animation:bounceIn .5s ease}
+#result.error{color:#ef4444;animation:fadeIn .3s ease}
+@keyframes bounceIn{0%{transform:scale(0.3);opacity:0}50%{transform:scale(1.1)}70%{transform:scale(0.9)}100%{transform:scale(1);opacity:1}}
+@keyframes fadeIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+
+/* Effects */
+.star-particle{position:fixed;pointer-events:none;font-size:2rem;z-index:1000;animation:starFloat 1.2s ease-out forwards}
+@keyframes starFloat{0%{transform:translateY(0) scale(1) rotate(0deg);opacity:1}100%{transform:translateY(-250px) scale(0.2) rotate(360deg);opacity:0}}
+.confetti-piece{position:fixed;pointer-events:none;z-index:999;animation:confettiFall 1.8s ease-out forwards}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(500px) rotate(720deg);opacity:0}}
+
+/* End screen */
+#end-screen{padding:16px 16px 20px;animation:endIn .6s ease-out;position:relative}
+#end-screen.hidden{display:none}
+@keyframes endIn{0%{opacity:0;transform:scale(0.85)}100%{opacity:1;transform:scale(1)}}
+.end-bg{position:absolute;inset:0;background:linear-gradient(135deg,#fef3c7,#fde68a,#fef3c7);border-radius:20px;opacity:0.35;pointer-events:none}
+.end-content{position:relative;z-index:1}
+.end-badge{font-size:4rem;display:block;margin-bottom:4px;animation:endBounce .8s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes endBounce{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0deg);opacity:1}}
+.end-medal{font-size:2.4rem;margin-bottom:4px;animation:endBounce .8s .2s both}
+.end-title{font-size:1.5rem;font-weight:800;color:#1e1e2f;margin-bottom:2px;line-height:1.2}
+.end-sub{font-size:0.9rem;color:#6b7280;margin-bottom:6px;font-weight:600}
+.end-stars-row{display:flex;justify-content:center;gap:3px;margin:6px 0;flex-wrap:wrap}
+.end-star{font-size:1.5rem;opacity:0;transform:scale(0);transition:all .3s}
+.end-star.show{opacity:1;transform:scale(1)}
+.end-star.empty{opacity:0.2;transform:scale(0.8)}
+.end-stat{font-size:0.85rem;color:#4b5563;font-weight:600;margin-bottom:8px}
+.end-btn-group{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.end-btn{
+font-family:'Fredoka',sans-serif;font-size:0.95rem;font-weight:700;
+padding:10px 22px;border:none;border-radius:12px;cursor:pointer;
+color:white;transition:all .25s;letter-spacing:0.3px;
+-webkit-tap-highlight-color:transparent;touch-action:manipulation
+}
+.end-btn.primary{background:linear-gradient(135deg,#4f46e5,#6366f1);box-shadow:0 4px 14px rgba(99,102,241,0.35)}
+.end-btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(99,102,241,0.45)}
+.end-btn.secondary{background:linear-gradient(135deg,#10b981,#34d399);box-shadow:0 4px 14px rgba(16,185,129,0.35)}
+.end-btn.secondary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,0.45)}
+.mode-tag{
+display:inline-block;padding:1px 8px;border-radius:6px;font-size:0.6rem;
+font-weight:700;letter-spacing:0.5px;margin-bottom:2px
+}
+.mode-tag.c1{background:#ede9fe;color:#4f46e5}
+.mode-tag.c2{background:#dbeafe;color:#2563eb}
+.challenge-badge.c3{background:#fce7f3;color:#db2777}
+.mode-tag.c3{background:#fce7f3;color:#db2777}
+
+@media(max-width:500px){
+body{padding:10px;min-height:100dvh}
+.menu-container{padding:22px 16px;margin:8px;border-radius:20px}
+.menu-title{font-size:1.35rem}
+.robot-container{width:75px;height:75px;margin:8px auto}
+.challenge-btn{padding:11px 12px;font-size:0.9rem;gap:8px;border-radius:12px}
+.challenge-btn .btn-num{width:34px;height:34px;font-size:0.95rem}
+.challenge-btn .btn-text{font-size:0.9rem}
+.challenge-btn .btn-desc{font-size:0.65rem}
+.game-card{padding:10px 10px 14px;border-radius:16px}
+.game-header{gap:4px;margin-bottom:4px}
+.game-title{font-size:0.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.game-level-badge{font-size:0.5rem;padding:1px 6px}
+.header-left{gap:4px;flex-wrap:nowrap;overflow:hidden}
+.back-btn{font-size:0.75rem;padding:5px 7px;border-radius:8px}
+.back-btn:hover{transform:none}
+.stars-display{font-size:0.9rem;padding:2px 7px;min-width:40px;border-radius:10px;white-space:nowrap}
+.timer-section{padding:5px 8px;margin:3px 0 6px;border-radius:8px}
+.total-timer-row{gap:5px;margin-bottom:2px}
+.total-time-text{font-size:0.75rem}
+.timer-bar-track{height:5px;border-radius:4px}
+.timer-bar-fill{border-radius:4px}
+.challenge-progress{font-size:0.65rem;min-width:36px}
+.q-timer-text{font-size:0.8rem}
+.q-timer-label{font-size:0.65rem}
+.cell{font-size:1.1rem;border-radius:7px}
+.cell.hidden-cell{font-size:1.3rem}
+#grid{gap:4px;max-width:280px}
+.seq-cell{width:46px;height:46px;font-size:1.1rem;border-radius:8px}
+.seq-cell.hidden{font-size:1.3rem}
+#sequence{gap:4px}
+.seq-arrow{font-size:1rem}
+#options{gap:8px}
+.option-btn{font-size:1.2rem;padding:8px 14px;min-width:65px;border-radius:10px}
+#question{font-size:1.05rem;margin:5px 0}
+#result{font-size:0.95rem;min-height:30px}
+#hint{font-size:0.75rem;min-height:26px}
+.end-title{font-size:1.2rem}
+.end-badge{font-size:2.6rem}
+.end-medal{font-size:1.8rem}
+.end-star{font-size:1.1rem}
+.end-btn{font-size:0.8rem;padding:7px 16px;border-radius:9px}
+#end-screen{padding:10px 8px 12px}
+.end-stat{font-size:0.8rem}
+.challenge-btn,.option-btn,.back-btn,.end-btn{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+}
+
+@media(max-width:400px){
+body{padding:6px}
+.menu-container{padding:16px 12px;margin:4px;border-radius:16px}
+.menu-title{font-size:1.15rem;line-height:1.2}
+.menu-subtitle{font-size:0.75rem}
+.robot-container{width:60px;height:60px;margin:6px auto}
+.divider-line{margin:10px auto}
+.challenge-btn{padding:9px 10px;font-size:0.8rem;gap:6px;border-radius:10px}
+.challenge-btn .btn-num{width:28px;height:28px;font-size:0.8rem;border-radius:8px}
+.challenge-btn .btn-text{font-size:0.8rem}
+.challenges{gap:7px}
+.game-card{padding:6px 6px 10px;border-radius:12px}
+.game-header{flex-direction:column;align-items:stretch;gap:4px}
+.header-left{justify-content:space-between}
+.game-title{font-size:0.7rem;max-width:120px}
+.back-btn{max-width:32px;font-size:0.7rem;padding:4px 5px}
+.stars-display{font-size:0.8rem;padding:1px 6px;min-width:36px;border-radius:8px;align-self:flex-end}
+.timer-section{padding:4px 6px;margin:2px 0 5px;border-radius:6px}
+.q-timer-row{flex-direction:row;gap:4px}
+.q-timer-text{font-size:0.75rem}
+.total-time-text{font-size:0.7rem}
+.timer-bar-track{height:4px}
+#grid{max-width:230px;gap:3px}
+.cell{font-size:0.9rem;border-radius:5px}
+.cell.hidden-cell{font-size:1.1rem}
+.seq-cell{width:36px;height:36px;font-size:0.85rem;border-radius:6px}
+.seq-cell.hidden{font-size:1rem}
+#sequence{gap:3px}
+.seq-arrow{font-size:0.8rem}
+.seq-label{font-size:0.65rem}
+#options{gap:6px}
+.option-btn{font-size:1rem;padding:6px 8px;min-width:50px;border-radius:8px}
+#question{font-size:0.9rem;margin:4px 0}
+#result{font-size:0.85rem;min-height:26px}
+#hint{font-size:0.7rem;min-height:22px}
+.end-title{font-size:1rem}
+.end-badge{font-size:2.2rem}
+.end-medal{font-size:1.5rem}
+.end-star{font-size:1rem}
+.end-btn{font-size:0.75rem;padding:6px 12px;border-radius:8px}
+.end-btn-group{gap:6px}
+#end-screen{padding:8px 6px 10px}
+.end-stat{font-size:0.75rem}
+.end-sub{font-size:0.75rem}
+.floating-q{display:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ===== MENU ===== -->
+<div id="menu-screen">
+<div class="floating-q">?</div><div class="floating-q">?</div>
+<div class="floating-q">?</div><div class="floating-q">?</div>
+<div class="menu-container">
+<div class="menu-title">DETECTIVE DE<br>LOS NÚMEROS</div>
+<p class="menu-subtitle">🕵️ ENCUENTRA EL NÚMERO PERDIDO</p>
+<div class="divider-line"></div>
+<div class="robot-container"><img src="interfase/robot.png" alt="Robot detective"></div>
+<div class="challenges">
+<button class="challenge-btn active" data-challenge="1">
+<span class="btn-num">1</span>
+<span class="btn-info">
+<span class="btn-text">DESAFÍO 1</span>
+<span class="btn-desc">La grilla numérica</span>
+</span>
+</button>
+<button class="challenge-btn active" data-challenge="2">
+<span class="btn-num">2</span>
+<span class="btn-info">
+<span class="btn-text">DESAFÍO 2</span>
+<span class="btn-desc">Descubre el patrón</span>
+</span>
+</button>
+<button class="challenge-btn active" data-challenge="3">
+<span class="btn-num">3</span>
+<span class="btn-info">
+<span class="btn-text">DESAFÍO 3</span>
+<span class="btn-desc">El reto del detective</span>
+</span>
+</button>
+</div>
+<div class="menu-footer-text">© 2026 — Detective de los Números</div>
+</div>
+</div>
+
+<!-- ===== GAME ===== -->
+<div id="game-screen">
+<div class="floating-q">?</div><div class="floating-q">?</div>
+<div class="floating-q">?</div><div class="floating-q">?</div>
+<div class="game-card">
+<div class="game-header">
+<div class="header-left">
+<button class="back-btn" id="back-to-menu">🏠 VOLVER</button>
+<div><div class="game-title">Detective de los Números <span class="game-level-badge" id="game-badge">DESAFÍO 1</span></div></div>
+</div>
+<div class="stars-display">⭐ <span id="star-count">0</span></div>
+</div>
+
+<div class="timer-section">
+<div class="total-timer-row">
+<span class="timer-icon">📊</span>
+<span class="total-time-text">Progreso</span>
+<div class="timer-bar-track"><div class="timer-bar-fill" id="progress-bar"></div></div>
+<span class="challenge-progress" id="challenge-progress">0/10</span>
+</div>
+<div class="q-timer-row">
+<span class="q-timer-label">⏱ Tiempo restante:</span>
+<span class="q-timer-text" id="q-timer-text">⏱ 30s</span>
+</div>
+</div>
+
+<div id="game-card-content">
+<div id="challenge-area"></div>
+<div id="question">¿QUÉ NÚMERO FALTA?</div>
+<div id="options"></div>
+<div id="hint"></div>
+<div id="result"></div>
+</div>
+
+<div id="end-screen" class="hidden">
+<div class="end-bg"></div>
+<div class="end-content">
+<div class="end-badge" id="end-icon">🏆</div>
+<div class="end-medal" id="end-medal">🥇</div>
+<div class="end-title" id="end-title">¡JUEGO COMPLETADO!</div>
+<div class="end-sub" id="end-sub">Completaste todos los desafíos</div>
+<div class="end-stars-row" id="end-stars-container"></div>
+<div class="end-stat" id="end-stat">⭐ 10 / 10 respuestas correctas</div>
+<div class="end-btn-group">
+<button class="end-btn secondary" id="end-replay-btn">🔄 JUGAR DE NUEVO</button>
+<button class="end-btn primary" id="end-back-btn">🏠 VOLVER AL MENÚ</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<script>
+// ===== EXERCISE POOLS =====
+const gridExercises=[
+{base:0,hiddenCol:2},{base:10,hiddenCol:2},{base:20,hiddenCol:2},{base:30,hiddenCol:1},
+{base:35,hiddenCol:2},{base:40,hiddenCol:3},{base:45,hiddenCol:1},{base:50,hiddenCol:2},
+{base:55,hiddenCol:3},{base:5,hiddenCol:1},{base:15,hiddenCol:3},{base:25,hiddenCol:1},
+{base:60,hiddenCol:2},{base:65,hiddenCol:1},{base:70,hiddenCol:3},{base:75,hiddenCol:2},
+{base:7,hiddenCol:2},{base:33,hiddenCol:1}
+];
+const patternExercises=[
+{start:4,step:2,hidden:3},{start:32,step:2,hidden:1},{start:2,step:2,hidden:2},{start:14,step:2,hidden:1},{start:50,step:2,hidden:3},
+{start:6,step:3,hidden:3},{start:21,step:3,hidden:2},{start:3,step:3,hidden:1},{start:33,step:3,hidden:2},{start:12,step:3,hidden:3},
+{start:8,step:4,hidden:2},{start:40,step:4,hidden:3},{start:4,step:4,hidden:1},{start:28,step:4,hidden:2},{start:60,step:4,hidden:3},
+{start:15,step:5,hidden:3},{start:50,step:5,hidden:1},{start:5,step:5,hidden:2},{start:35,step:5,hidden:1},{start:70,step:5,hidden:3}
+];
+const riddleExercises=[
+{q:'¿CUÁL ES EL NÚMERO MAYOR?',o:[32,45,28,39],a:45},
+{q:'¿CUÁL ES EL NÚMERO MAYOR?',o:[52,49,61,58],a:61},
+{q:'¿CUÁL ES EL NÚMERO MAYOR?',o:[71,63,55,48],a:71},
+{q:'¿CUÁL ES EL NÚMERO MENOR?',o:[52,49,61,58],a:49},
+{q:'¿CUÁL ES EL NÚMERO MENOR?',o:[37,54,46,62],a:37},
+{q:'¿CUÁL ES EL NÚMERO MENOR?',o:[81,19,72,64],a:19},
+{q:'¿QUÉ NÚMERO ESTÁ MÁS CERCA DE 50?',o:[48,61,72,35],a:48},
+{q:'¿QUÉ NÚMERO ESTÁ MÁS CERCA DE 100?',o:[92,74,81,67],a:92},
+{q:'¿QUÉ NÚMERO ESTÁ MÁS CERCA DE 20?',o:[18,35,42,57],a:18},
+{q:'¿CUÁL ESTÁ MÁS LEJOS DE 50?',o:[48,52,15,47],a:15},
+{q:'¿CUÁL ESTÁ MÁS LEJOS DE 30?',o:[28,32,55,27],a:55},
+{q:'¿QUÉ NÚMERO ESTÁ ENTRE 40 Y 50?',o:[37,54,46,62],a:46},
+{q:'¿QUÉ NÚMERO ESTÁ ENTRE 20 Y 30?',o:[18,25,32,38],a:25},
+{q:'¿QUÉ NÚMERO TERMINA EN 7?',o:[42,37,51,69],a:37},
+{q:'¿QUÉ NÚMERO TERMINA EN 3?',o:[43,54,61,78],a:43},
+{q:'¿QUÉ NÚMERO COMIENZA CON 8?',o:[81,19,72,64],a:81},
+{q:'¿QUÉ NÚMERO COMIENZA CON 5?',o:[15,51,53,59],a:51},
+{q:'¿QUÉ NÚMERO ES PAR?',o:[23,35,48,57],a:48},
+{q:'¿QUÉ NÚMERO ES IMPAR?',o:[40,62,75,88],a:75},
+{q:'¿QUÉ NÚMERO ES PAR?',o:[31,44,57,63],a:44},
+{q:'¿QUÉ NÚMERO ES IMPAR?',o:[52,68,79,84],a:79},
+{q:'¿QUÉ NÚMERO VIENE DESPUÉS DE 58?',o:[57,59,60,61],a:59},
+{q:'¿QUÉ NÚMERO VIENE ANTES DE 30?',o:[28,29,31,32],a:29},
+{q:'¿QUÉ NÚMERO VIENE DESPUÉS DE 75?',o:[74,76,77,78],a:76},
+{q:'¿QUÉ NÚMERO VIENE ANTES DE 50?',o:[48,49,51,52],a:49},
+{q:'¿QUÉ NÚMERO FALTA? 25 · 26 · ? · 28 · 29',o:[24,27,30,31],a:27},
+{q:'¿QUÉ NÚMERO FALTA? 10 · 12 · ? · 16 · 18',o:[13,14,15,17],a:14},
+{q:'SOY MAYOR QUE 60 Y MENOR QUE 70. ¿QUIÉN SOY?',o:[45,67,72,59],a:67},
+{q:'SOY MAYOR QUE 30 Y MENOR QUE 40. ¿QUIÉN SOY?',o:[28,35,42,39],a:35},
+{q:'SOY MAYOR QUE 80 Y MENOR QUE 90. ¿QUIÉN SOY?',o:[75,85,92,79],a:85},
+{q:'SOY UN NÚMERO QUE TERMINA EN 5 Y ES MAYOR QUE 40.',o:[25,35,45,38],a:45},
+{q:'SOY UN NÚMERO PAR Y MENOR QUE 30.',o:[32,28,35,22],a:28}
+];
+
+const TOTAL_TIME=300,QUESTION_TIME=30,TOTAL_CHALLENGES=10;
+let usedExercises=[],stars=0,errors=0,answered=false,currentExercise=null;
+let totalTimeLeft=TOTAL_TIME,questionTimeLeft=QUESTION_TIME;
+let totalTimerInterval=null,questionTimerInterval=null;
+let currentChallenge=0,challenges=[],gameActive=false,advanceTimeout=null;
+let challengeType=1;
+
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+
+// ===== CHALLENGE 1 - Grid =====
+function getGridAnswer(ex){return ex.base+10+ex.hiddenCol}
+function getGridDistractors(ans,ex){
+const c=[];const pool=[ex.base+ex.hiddenCol,ex.base+20+ex.hiddenCol];
+for(const o of[-3,-2,2,3,5,-5])pool.push(ans+o);
+for(const v of pool){if(v!==ans&&v>0&&!c.includes(v))c.push(v)}
+shuffle(c);return c.slice(0,2)
+}
+function renderGrid(ex){
+let h='<div id="grid">';
+for(let r=0;r<3;r++)for(let c=0;c<5;c++){
+if(r===1&&c===ex.hiddenCol)h+='<div class="cell hidden-cell" id="hidden-cell">?</div>';
+else h+=`<div class="cell">${ex.base+r*10+c}</div>`
+}
+h+='</div>';return h
+}
+
+// ===== CHALLENGE 2 - Pattern =====
+function getPatternAnswer(ex){return ex.start+ex.step*ex.hidden}
+function getPatternDistractors(ans,ex){
+const seq=Array.from({length:5},(_,i)=>ex.start+ex.step*i);
+const visible=seq.filter((_,i)=>i!==ex.hidden);
+const c=[];
+[ans-1,ans+1,ans-ex.step,ans+ex.step,ans-2,ans+2].forEach(v=>{
+if(v!==ans&&v>0&&!visible.includes(v)&&!c.includes(v))c.push(v)
+});
+if(c.length<2){for(let i=1;i<=5;i++){const v=ans+i;if(v!==ans&&!visible.includes(v)&&!c.includes(v))c.push(v)}}
+for(let i=1;i<=5;i++){const v=ans-i;if(v!==ans&&!visible.includes(v)&&!c.includes(v))c.push(v)}
+shuffle(c);return c.slice(0,2)
+}
+function renderSequence(ex){
+const seq=Array.from({length:5},(_,i)=>ex.start+ex.step*i);
+let h='';
+if(challengeType===2)h+=`<div class="challenge-badge c2">🔍 PATRÓN OCULTO</div>`;
+h+='<div id="sequence">';
+seq.forEach((v,i)=>{
+if(i>0)h+='<span class="seq-arrow">→</span>';
+if(i===ex.hidden)h+=`<div class="seq-cell hidden" id="hidden-cell">?</div>`;
+else h+=`<div class="seq-cell">${v}</div>`
+});
+h+='</div>';return h
+}
+function getPatternHint(ex,level){
+if(level===1)return '💡 OBSERVA CUÁNTO AUMENTAN LOS NÚMEROS.';
+if(level===2)return '💡 LA DIFERENCIA ENTRE LOS NÚMEROS SIEMPRE ES LA MISMA.';
+return `💡 LOS NÚMEROS AVANZAN DE ${ex.step} EN ${ex.step}.`
+}
+
+// ===== GENERIC EXERCISE =====
+function getExercisePool(){return challengeType===1?gridExercises:challengeType===2?patternExercises:riddleExercises}
+function getAnswer(ex){return challengeType===3?ex.a:challengeType===1?getGridAnswer(ex):getPatternAnswer(ex)}
+function getDistractors(ans,ex){return challengeType===1?getGridDistractors(ans,ex):challengeType===2?getPatternDistractors(ans,ex):[]}
+function renderChallenge(ex){
+const area=document.getElementById('challenge-area');
+if(challengeType===3){
+area.innerHTML='<div class="challenge-badge c3">🎯 RETO DEL DETECTIVE</div>';
+document.getElementById('question').textContent=ex.q
+}else{
+area.innerHTML=challengeType===1?renderGrid(ex):renderSequence(ex);
+document.getElementById('question').textContent='¿QUÉ NÚMERO FALTA?'
+}
+}
+function getCustomHint(ex,level){
+if(challengeType===1)return null;
+if(challengeType===2)return getPatternHint(ex,level);
+if(level===1)return '💡 LEE ATENTAMENTE LA PREGUNTA.';
+if(level===2)return '💡 ANALIZA CADA OPCIÓN UNA POR UNA.';
+return '💡 DESCARTA LAS OPCIONES QUE NO CUMPLEN LA CONDICIÓN.'
+}
+function getCorrectMessage(){return '🎉 ¡MUY BIEN!'}
+
+// ===== TIMERS & GAME LOOP =====
+function startGame(type){
+challengeType=type;
+const shuffled=shuffle([...getExercisePool()]);
+challenges=shuffled.slice(0,TOTAL_CHALLENGES);
+currentChallenge=0;stars=0;gameActive=true;totalTimeLeft=TOTAL_TIME;
+document.getElementById('star-count').textContent='0';
+document.getElementById('game-card-content').style.display='block';
+document.getElementById('end-screen').classList.add('hidden');
+document.getElementById('game-badge').textContent=type===1?'DESAFÍO 1':type===2?'DESAFÍO 2':'DESAFÍO 3';
+try{SoundFX.play('start')}catch(e){};
+totalTimerInterval=setInterval(updateTimers,1000);
+loadChallenge()
+}
+function loadChallenge(){
+errors=0;answered=false;questionTimeLeft=QUESTION_TIME;
+if(advanceTimeout){clearTimeout(advanceTimeout);advanceTimeout=null}
+document.getElementById('hint').textContent='';
+document.getElementById('result').textContent='';
+document.getElementById('result').className='';
+updateProgress();
+const ex=challenges[currentChallenge];currentExercise=ex;
+renderChallenge(ex);
+renderOptions(getAnswer(ex),ex);
+if(questionTimerInterval)clearInterval(questionTimerInterval);
+questionTimerInterval=setInterval(updateQuestionTimer,1000);
+updateQuestionTimerDisplay()
+}
+function updateTimers(){totalTimeLeft--;if(totalTimeLeft<=0)endGame('time')}
+function updateProgress(){
+const done=currentChallenge;
+document.getElementById('progress-bar').style.width=(done/TOTAL_CHALLENGES*100)+'%';
+document.getElementById('challenge-progress').textContent=`${done}/${TOTAL_CHALLENGES}`
+}
+function updateQuestionTimer(){
+questionTimeLeft--;updateQuestionTimerDisplay();
+if(questionTimeLeft<=0)handleTimeout()
+}
+function updateQuestionTimerDisplay(){
+const el=document.getElementById('q-timer-text');
+el.textContent=`⏱ ${questionTimeLeft}s`;
+if(questionTimeLeft<=10){el.style.color='#ef4444';el.classList.add('urgent')}
+else{el.style.color='#6366f1';el.classList.remove('urgent')}
+}
+function handleTimeout(){
+if(answered||!gameActive)return;
+answered=true;
+try{SoundFX.play('timeout')}catch(e){}
+clearInterval(questionTimerInterval);
+document.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);
+const ex=challenges[currentChallenge];const answer=getAnswer(ex);
+const h=document.getElementById('hidden-cell');
+if(h){h.textContent=answer;h.classList.remove('hidden');h.classList.add('revealed')}
+document.getElementById('result').textContent='⏰ SE ACABÓ EL TIEMPO.';
+document.getElementById('result').className='error';
+document.querySelectorAll('.option-btn').forEach(b=>{if(Number(b.dataset.value)===answer)b.classList.add('correct')});
+if(currentChallenge>=TOTAL_CHALLENGES-1)endGame('time');
+else advanceTimeout=setTimeout(()=>advanceChallenge(),2000)
+}
+function handleAnswer(selected,correct){
+if(answered||!gameActive)return;
+const btns=document.querySelectorAll('.option-btn');
+if(selected===correct){
+answered=true;clearInterval(questionTimerInterval);
+btns.forEach(b=>{b.disabled=true;if(Number(b.dataset.value)===correct)b.classList.add('correct')});
+const h=document.getElementById('hidden-cell');
+if(h){h.textContent=correct;h.classList.remove('hidden');h.classList.add('revealed')}
+document.getElementById('result').textContent='🎉 ¡MUY BIEN!';
+document.getElementById('result').className='success';
+stars++;document.getElementById('star-count').textContent=stars;
+try{SoundFX.play('correct');spawnStars();spawnConfetti()}catch(e){}
+if(currentChallenge>=TOTAL_CHALLENGES-1)endGame('complete');
+else advanceChallenge()
+}else{
+errors++;
+try{SoundFX.play('wrong')}catch(e){}
+document.getElementById('result').textContent='❌ INTÉNTALO DE NUEVO.';
+document.getElementById('result').className='error';
+btns.forEach(b=>{if(Number(b.dataset.value)===selected){b.classList.add('wrong');setTimeout(()=>b.classList.remove('wrong'),600)}});
+const custom=getCustomHint(currentExercise,errors);
+if(custom)document.getElementById('hint').textContent=custom;
+else if(errors===1)document.getElementById('hint').textContent='💡 OBSERVA EL NÚMERO ANTERIOR Y EL SIGUIENTE.';
+else if(errors>=2){const a=getAnswer(currentExercise);document.getElementById('hint').textContent=`💡 ENTRE EL ${a-1} Y EL ${a+1} SOLO HAY UN NÚMERO.`}
+}
+}
+function advanceChallenge(){currentChallenge++;if(currentChallenge>=TOTAL_CHALLENGES)endGame('complete');else loadChallenge()}
+function renderOptions(ans,ex){
+const ct=document.getElementById('options');ct.innerHTML='';
+const opts=challengeType===3?ex.o:shuffle([ans,...getDistractors(ans,ex)]);
+for(const opt of opts){
+const b=document.createElement('button');
+b.className='option-btn';b.textContent=opt;b.dataset.value=opt;
+b.addEventListener('click',()=>handleAnswer(Number(opt),ans));
+ct.appendChild(b)
+}
+}
+
+// ===== END SCREEN =====
+function endGame(reason){
+gameActive=false;clearInterval(totalTimerInterval);clearInterval(questionTimerInterval);
+if(advanceTimeout){clearTimeout(advanceTimeout);advanceTimeout=null}
+document.getElementById('game-card-content').style.display='none';
+document.getElementById('end-screen').classList.remove('hidden');
+const medals=['😞','🥉','🥉','🥉','🥉','🥈','🥈','🥈','🥇','🥇','🏆'];
+document.getElementById('end-medal').textContent=medal[stars]||'🎖️';
+if(reason==='complete'){
+document.getElementById('end-icon').textContent='🎉';
+document.getElementById('end-title').textContent='¡JUEGO COMPLETADO!';
+document.getElementById('end-sub').textContent='¡Completaste todos los desafíos!';try{SoundFX.play('complete')}catch(e){}
+}else{
+document.getElementById('end-icon').textContent='⏰';
+document.getElementById('end-title').textContent='¡TIEMPO AGOTADO!';
+document.getElementById('end-sub').textContent=`Completaste ${currentChallenge} de 10 desafíos`;try{SoundFX.play('timeout')}catch(e){}
+}
+document.getElementById('end-stat').textContent=`⭐ ${stars} / 10 respuestas correctas`;
+if(reason==='complete'){document.getElementById('progress-bar').style.width='100%';document.getElementById('challenge-progress').textContent='10/10'}
+const container=document.getElementById('end-stars-container');container.innerHTML='';
+for(let i=0;i<10;i++){const s=document.createElement('span');s.className='end-star'+(i<stars?' show':' empty');s.textContent='⭐';s.style.animationDelay=(i*0.12)+'s';container.appendChild(s)}
+setTimeout(()=>{document.querySelectorAll('.end-star.show').forEach((el,i)=>{setTimeout(()=>{el.style.opacity='1';el.style.transform='scale(1)'},i*120)})},100);
+spawnConfetti()
+}
+
+// ===== EFFECTS =====
+function spawnStars(){
+const r=document.querySelector('.game-card').getBoundingClientRect();
+const cx=r.left+r.width/2,cy=r.top+r.height/2;
+for(let i=0;i<6;i++){
+const e=document.createElement('div');e.className='star-particle';e.textContent='⭐';
+e.style.left=(cx-20+Math.random()*40)+'px';e.style.top=(cy-20+Math.random()*40)+'px';
+e.style.animationDelay=(i*0.08)+'s';document.body.appendChild(e);setTimeout(()=>e.remove(),1500)
+}
+}
+function spawnConfetti(){
+const colors=['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#54a0ff','#10b981','#f59e0b','#a78bfa'];
+for(let i=0;i<48;i++){
+const e=document.createElement('div');e.className='confetti-piece';
+const s=5+Math.random()*10;
+e.style.width=s+'px';e.style.height=s+'px';
+e.style.background=colors[Math.floor(Math.random()*colors.length)];
+e.style.left=(10+Math.random()*80)+'%';e.style.top='-20px';
+e.style.borderRadius=Math.random()>.5?'50%':'2px';
+e.style.animationDuration=(1.2+Math.random()*1.2)+'s';
+e.style.animationDelay=(Math.random()*0.6)+'s';
+document.body.appendChild(e);setTimeout(()=>e.remove(),2500)
+}
+}
+
+// ===== SOUND FX =====
+const SoundFX={
+ctx:null,
+getCtx(){return this.ctx||(this.ctx=new(window.AudioContext||window.webkitAudioContext)())},
+_correct(){const c=this.getCtx(),t=c.currentTime;[523,659,784].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';g.gain.setValueAtTime(0.25,t+i*0.1);g.gain.exponentialRampToValueAtTime(0.01,t+i*0.1+0.35);o.frequency.setValueAtTime(f,t+i*0.1);o.start(t+i*0.1);o.stop(t+i*0.1+0.35)})},
+_wrong(){const c=this.getCtx(),t=c.currentTime;const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='square';g.gain.setValueAtTime(0.15,t);g.gain.exponentialRampToValueAtTime(0.01,t+0.3);o.frequency.setValueAtTime(180,t);o.frequency.linearRampToValueAtTime(120,t+0.25);o.start(t);o.stop(t+0.3)},
+_timeout(){const c=this.getCtx(),t=c.currentTime;[0,0.12,0.24].forEach(d=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sawtooth';g.gain.setValueAtTime(0.12,t+d);g.gain.exponentialRampToValueAtTime(0.01,t+d+0.1);o.frequency.setValueAtTime(380,t+d);o.frequency.linearRampToValueAtTime(280,t+d+0.08);o.start(t+d);o.stop(t+d+0.1)})},
+_complete(){const c=this.getCtx(),t=c.currentTime;[523,659,784,1047].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';g.gain.setValueAtTime(0.3,t+i*0.12);g.gain.exponentialRampToValueAtTime(0.01,t+i*0.12+0.4);o.frequency.setValueAtTime(f,t+i*0.12);o.start(t+i*0.12);o.stop(t+i*0.12+0.4)})},
+_start(){const c=this.getCtx(),t=c.currentTime;const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';g.gain.setValueAtTime(0.2,t);g.gain.exponentialRampToValueAtTime(0.01,t+0.35);o.frequency.setValueAtTime(440,t);o.frequency.setValueAtTime(660,t+0.15);o.start(t);o.stop(t+0.35)},
+play(e){if(this['_'+e])this['_'+e]()}
+};
+
+// ===== SCREENS =====
+const menuScreen=document.getElementById('menu-screen');
+const gameScreen=document.getElementById('game-screen');
+
+function showMenu(){
+gameActive=false;clearInterval(totalTimerInterval);clearInterval(questionTimerInterval);
+if(advanceTimeout){clearTimeout(advanceTimeout);advanceTimeout=null}
+gameScreen.classList.remove('visible');gameScreen.style.display='none';
+document.getElementById('game-card-content').style.display='block';
+document.getElementById('end-screen').classList.add('hidden');
+menuScreen.classList.remove('hidden');menuScreen.style.display='flex'
+}
+function showGame(type){
+menuScreen.classList.add('hidden');
+setTimeout(()=>{menuScreen.style.display='none';gameScreen.style.display='flex';gameScreen.classList.add('visible');startGame(type)},400)
+}
+
+document.querySelectorAll('.challenge-btn.active[data-challenge]').forEach(b=>{
+b.addEventListener('click',()=>showGame(Number(b.dataset.challenge)))
+});
+document.querySelectorAll('.challenge-btn.locked').forEach(b=>
+b.addEventListener('click',()=>{b.style.transform='scale(0.97)';setTimeout(()=>b.style.transform='',200)})
+);
+document.getElementById('back-to-menu').addEventListener('click',showMenu);
+document.getElementById('end-back-btn').addEventListener('click',showMenu);
+document.getElementById('end-replay-btn').addEventListener('click',()=>showGame(challengeType));
+</script>
+</body>
+</html>
