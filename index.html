@@ -88,6 +88,12 @@ background:rgba(255,255,255,0.15);transition:all .25s
 .challenge-btn.locked .btn-text::after{content:' 🔒';font-size:0.9rem}
 .challenge-btn.locked .btn-desc{color:rgba(255,255,255,0.3)}
 .menu-footer-text{font-size:0.7rem;color:rgba(255,255,255,0.2);margin-top:18px;letter-spacing:1px}
+.menu-info-box{
+background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+border-radius:14px;padding:10px 14px;margin-top:12px;
+font-size:0.75rem;color:rgba(255,255,255,0.75);line-height:1.4;text-align:center;
+border:1px solid rgba(255,255,255,0.08);font-weight:500
+}
 
 /* ===== GAME (shared) ===== */
 #game-screen{
@@ -293,6 +299,7 @@ body{padding:10px;min-height:100dvh}
 .end-btn{font-size:0.8rem;padding:7px 16px;border-radius:9px}
 #end-screen{padding:10px 8px 12px}
 .end-stat{font-size:0.8rem}
+.menu-info-box{font-size:0.65rem;padding:8px 10px;margin-top:8px}
 .challenge-btn,.option-btn,.back-btn,.end-btn{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 }
 
@@ -340,6 +347,7 @@ body{padding:6px}
 #end-screen{padding:8px 6px 10px}
 .end-stat{font-size:0.75rem}
 .end-sub{font-size:0.75rem}
+.menu-info-box{font-size:0.6rem;padding:6px 8px;border-radius:10px}
 .floating-q{display:none}
 }
 </style>
@@ -378,7 +386,8 @@ body{padding:6px}
 <span class="btn-desc">El reto del detective</span>
 </span>
 </button>
-</div>
+ </div>
+<div class="menu-info-box">Versión en línea para aprender y jugar con el afiche que acompañó la segunda Revista Primaria 2026.</div>
 <div class="menu-footer-text">© 2026 — Detective de los Números</div>
 </div>
 </div>
