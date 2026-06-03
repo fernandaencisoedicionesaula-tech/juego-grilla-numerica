@@ -88,13 +88,7 @@ background:rgba(255,255,255,0.15);transition:all .25s
 .challenge-btn.locked .btn-text::after{content:' 🔒';font-size:0.9rem}
 .challenge-btn.locked .btn-desc{color:rgba(255,255,255,0.3)}
 .menu-footer-text{font-size:0.7rem;color:rgba(255,255,255,0.2);margin-top:18px;letter-spacing:1px}
-.menu-info-box{
-background:white;border-radius:14px;padding:12px 14px 10px;margin-top:12px;
-font-size:0.75rem;color:#1e1e2f;line-height:1.4;text-align:center;
-border:1px solid rgba(0,0,0,0.06);font-weight:500
-}
-.info-thumbs{display:flex;justify-content:center;gap:10px;margin-bottom:8px}
-.info-thumb{width:80px;height:auto;border-radius:8px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+.menu-text-img{display:block;max-width:100%;height:auto;margin:10px auto 0;border-radius:8px}
 
 /* ===== GAME (shared) ===== */
 #game-screen{
@@ -300,10 +294,7 @@ body{padding:10px;min-height:100dvh}
 .end-btn{font-size:0.8rem;padding:7px 16px;border-radius:9px}
 #end-screen{padding:10px 8px 12px}
 .end-stat{font-size:0.8rem}
-.menu-info-box{font-size:0.65rem;padding:8px 10px;margin-top:8px}
-.info-thumb{width:60px}
 .challenge-btn,.option-btn,.back-btn,.end-btn{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-}
 
 @media(max-width:400px){
 body{padding:6px}
@@ -349,8 +340,6 @@ body{padding:6px}
 #end-screen{padding:8px 6px 10px}
 .end-stat{font-size:0.75rem}
 .end-sub{font-size:0.75rem}
-.menu-info-box{font-size:0.6rem;padding:6px 8px;border-radius:10px}
-.info-thumb{width:50px}
 .floating-q{display:none}
 }
 </style>
@@ -390,13 +379,7 @@ body{padding:6px}
 </span>
 </button>
  </div>
-<div class="menu-info-box">
-<div class="info-thumbs">
-<img src="interfase/grilla-thumb.jpg" alt="Grilla numérica" class="info-thumb">
-<img src="interfase/tapa-thumb.jpg" alt="Tapa revista" class="info-thumb">
-</div>
-Versión en línea para aprender y jugar con el afiche de la grilla numérica que acompañó la segunda Revista Primaria 2026.
-</div>
+<img src="interfase/texto.png" alt="Texto" class="menu-text-img">
 <div class="menu-footer-text">© 2026 — Detective de los Números</div>
 </div>
 </div>
