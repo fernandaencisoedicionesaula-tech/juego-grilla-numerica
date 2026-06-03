@@ -7,6 +7,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+:root{
+--c-start:#4f46e5;--c-end:#6366f1;
+--c-shadow:rgba(99,102,241,0.4);--c-shadow-hover:rgba(99,102,241,0.5)
+}
+[data-challenge="1"]{--c-start:#d63384;--c-end:#e91e63;--c-shadow:rgba(214,51,132,0.4);--c-shadow-hover:rgba(214,51,132,0.5)}
+[data-challenge="2"]{--c-start:#7c3aed;--c-end:#8b5cf6;--c-shadow:rgba(124,58,237,0.4);--c-shadow-hover:rgba(124,58,237,0.5)}
+[data-challenge="3"]{--c-start:#0ea5e9;--c-end:#38bdf6;--c-shadow:rgba(14,165,233,0.4);--c-shadow-hover:rgba(14,165,233,0.5)}
 body{
 font-family:'Fredoka',sans-serif;
 min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;
@@ -59,8 +66,12 @@ font-size:1.1rem;font-weight:700;text-align:left;transition:all .25s;
 position:relative;overflow:hidden;text-decoration:none;color:white;
 -webkit-tap-highlight-color:transparent;touch-action:manipulation
 }
-.challenge-btn.active{background:linear-gradient(135deg,#4f46e5,#6366f1);box-shadow:0 4px 20px rgba(99,102,241,0.4)}
-.challenge-btn.active:hover{transform:translateX(6px) translateY(-2px);box-shadow:0 8px 30px rgba(99,102,241,0.5)}
+.challenge-btn.active[data-challenge="1"]{background:linear-gradient(135deg,#d63384,#e91e63);box-shadow:0 4px 20px rgba(214,51,132,0.4)}
+.challenge-btn.active[data-challenge="1"]:hover{box-shadow:0 8px 30px rgba(214,51,132,0.5)}
+.challenge-btn.active[data-challenge="2"]{background:linear-gradient(135deg,#7c3aed,#8b5cf6);box-shadow:0 4px 20px rgba(124,58,237,0.4)}
+.challenge-btn.active[data-challenge="2"]:hover{box-shadow:0 8px 30px rgba(124,58,237,0.5)}
+.challenge-btn.active[data-challenge="3"]{background:linear-gradient(135deg,#0ea5e9,#38bdf6);box-shadow:0 4px 20px rgba(14,165,233,0.4)}
+.challenge-btn.active[data-challenge="3"]:hover{box-shadow:0 8px 30px rgba(14,165,233,0.5)}
 .challenge-btn.active:active{transform:translateX(2px) translateY(0)}
 .challenge-btn.active::after{content:'▶';position:absolute;right:18px;font-size:1rem;opacity:0.6}
 .challenge-btn.locked{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.35);cursor:not-allowed;border:1px solid rgba(255,255,255,0.06)}
@@ -98,17 +109,17 @@ margin-bottom:6px;flex-wrap:wrap;gap:6px
 .header-left{display:flex;align-items:center;gap:8px}
 .back-btn{
 display:inline-flex;align-items:center;gap:5px;
-background:linear-gradient(135deg,#4f46e5,#6366f1);
+background:linear-gradient(135deg,var(--c-start),var(--c-end));
 border:none;font-size:0.95rem;cursor:pointer;padding:7px 12px;
 border-radius:10px;transition:all .2s;color:white;
 font-family:'Fredoka',sans-serif;font-weight:700;
-box-shadow:0 3px 10px rgba(79,70,229,0.3);white-space:nowrap;
+box-shadow:0 3px 10px var(--c-shadow);white-space:nowrap;
 -webkit-tap-highlight-color:transparent;touch-action:manipulation
 }
-.back-btn:hover{background:linear-gradient(135deg,#4338ca,#4f46e5);transform:translateX(-2px);box-shadow:0 5px 16px rgba(79,70,229,0.4)}
+.back-btn:hover{background:linear-gradient(135deg,var(--c-start),var(--c-end));transform:translateX(-2px);box-shadow:0 5px 16px var(--c-shadow-hover)}
 .game-title{font-size:1rem;font-weight:700;color:#1e1e2f;text-align:left}
 .game-level-badge{
-display:inline-block;background:linear-gradient(135deg,#4f46e5,#6366f1);
+display:inline-block;background:linear-gradient(135deg,var(--c-start),var(--c-end));
 color:white;padding:1px 10px;border-radius:10px;font-size:0.65rem;font-weight:700;letter-spacing:1px;margin-left:4px
 }
 .stars-display{
@@ -123,10 +134,10 @@ border:2px solid #fbbf24;min-width:50px;justify-content:center
 .timer-icon{font-size:1rem}
 .total-time-text{font-size:0.9rem;font-weight:700;color:#1e1e2f}
 .timer-bar-track{flex:1;height:8px;background:#e5e7eb;border-radius:8px;overflow:hidden}
-.timer-bar-fill{height:100%;width:0%;border-radius:8px;background:linear-gradient(90deg,#6366f1,#818cf8);transition:width .6s ease}
-.challenge-progress{font-size:0.8rem;font-weight:700;color:#6366f1;min-width:44px;text-align:right}
+.timer-bar-fill{height:100%;width:0%;border-radius:8px;background:linear-gradient(90deg,var(--c-start),var(--c-end));transition:width .6s ease}
+.challenge-progress{font-size:0.8rem;font-weight:700;color:var(--c-start);min-width:44px;text-align:right}
 .q-timer-row{display:flex;align-items:center;gap:8px;justify-content:space-between}
-.q-timer-text{font-size:0.95rem;font-weight:700;color:#6366f1;transition:color .3s;font-variant-numeric:tabular-nums}
+.q-timer-text{font-size:0.95rem;font-weight:700;color:var(--c-start);transition:color .3s;font-variant-numeric:tabular-nums}
 .q-timer-text.urgent{color:#ef4444;animation:qPulse .5s ease-in-out infinite}
 @keyframes qPulse{0%,100%{opacity:1}50%{opacity:0.5}}
 .q-timer-label{font-size:0.75rem;color:#9ca3af;font-weight:600}
@@ -134,16 +145,16 @@ border:2px solid #fbbf24;min-width:50px;justify-content:center
 display:inline-block;padding:2px 10px;border-radius:8px;
 font-size:0.7rem;font-weight:700;letter-spacing:0.5px;margin-bottom:6px
 }
-.challenge-badge.c1{background:#ede9fe;color:#4f46e5}
-.challenge-badge.c2{background:#dbeafe;color:#2563eb}
+.challenge-badge.c1{background:#fce4ec;color:#d63384}
+.challenge-badge.c2{background:#ede9fe;color:#7c3aed}
 
 /* ===== CHALLENGE 1 - Grid ===== */
 #grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;max-width:400px;margin:8px auto}
 .cell{
 aspect-ratio:1;display:flex;align-items:center;justify-content:center;
-font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#4f46e5,#6366f1);
+font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--c-start),var(--c-end));
 color:white;border-radius:12px;transition:all .3s;user-select:none;
-box-shadow:0 3px 8px rgba(79,70,229,0.3);touch-action:manipulation
+box-shadow:0 3px 8px var(--c-shadow);touch-action:manipulation
 }
 .cell.hidden-cell{
 background:linear-gradient(135deg,#f59e0b,#fbbf24);
@@ -158,8 +169,8 @@ animation:cellPulse 1.2s ease-in-out infinite;font-size:1.8rem
 #sequence{display:flex;gap:10px;justify-content:center;margin:12px auto;flex-wrap:wrap}
 .seq-cell{
 width:68px;height:68px;display:flex;align-items:center;justify-content:center;
-font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,#2563eb,#3b82f6);
-color:white;border-radius:14px;box-shadow:0 3px 8px rgba(37,99,235,0.3)
+font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,var(--c-start),var(--c-end));
+color:white;border-radius:14px;box-shadow:0 3px 8px var(--c-shadow)
 }
 .seq-cell.hidden{
 background:linear-gradient(135deg,#f59e0b,#fbbf24);
@@ -179,11 +190,11 @@ display:flex;align-items:center;font-size:1.5rem;color:#9ca3af;font-weight:700
 font-family:'Fredoka',sans-serif;font-size:1.5rem;font-weight:700;
 padding:12px 26px;border:none;border-radius:14px;cursor:pointer;
 transition:all .2s;min-width:90px;color:white;
-background:linear-gradient(135deg,#6366f1,#818cf8);
-box-shadow:0 4px 14px rgba(99,102,241,0.4);letter-spacing:0.5px;
+background:linear-gradient(135deg,var(--c-start),var(--c-end));
+box-shadow:0 4px 14px var(--c-shadow);letter-spacing:0.5px;
 -webkit-tap-highlight-color:transparent;touch-action:manipulation
 }
-.option-btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 6px 24px rgba(99,102,241,0.5)}
+.option-btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 6px 24px var(--c-shadow-hover)}
 .option-btn:active:not(:disabled){transform:translateY(0)}
 .option-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
 .option-btn.correct{background:linear-gradient(135deg,#10b981,#34d399)!important;box-shadow:0 4px 14px rgba(16,185,129,0.4)!important;transform:scale(1.05)}
@@ -225,18 +236,18 @@ padding:10px 22px;border:none;border-radius:12px;cursor:pointer;
 color:white;transition:all .25s;letter-spacing:0.3px;
 -webkit-tap-highlight-color:transparent;touch-action:manipulation
 }
-.end-btn.primary{background:linear-gradient(135deg,#4f46e5,#6366f1);box-shadow:0 4px 14px rgba(99,102,241,0.35)}
-.end-btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(99,102,241,0.45)}
+.end-btn.primary{background:linear-gradient(135deg,var(--c-start),var(--c-end));box-shadow:0 4px 14px var(--c-shadow)}
+.end-btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px var(--c-shadow-hover)}
 .end-btn.secondary{background:linear-gradient(135deg,#10b981,#34d399);box-shadow:0 4px 14px rgba(16,185,129,0.35)}
 .end-btn.secondary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,185,129,0.45)}
 .mode-tag{
 display:inline-block;padding:1px 8px;border-radius:6px;font-size:0.6rem;
 font-weight:700;letter-spacing:0.5px;margin-bottom:2px
 }
-.mode-tag.c1{background:#ede9fe;color:#4f46e5}
-.mode-tag.c2{background:#dbeafe;color:#2563eb}
-.challenge-badge.c3{background:#fce7f3;color:#db2777}
-.mode-tag.c3{background:#fce7f3;color:#db2777}
+.mode-tag.c1{background:#fce4ec;color:#d63384}
+.mode-tag.c2{background:#ede9fe;color:#7c3aed}
+.challenge-badge.c3{background:#e0f2fe;color:#0ea5e9}
+.mode-tag.c3{background:#e0f2fe;color:#0ea5e9}
 
 @media(max-width:500px){
 body{padding:10px;min-height:100dvh}
@@ -565,7 +576,8 @@ currentChallenge=0;stars=0;gameActive=true;totalTimeLeft=TOTAL_TIME;
 document.getElementById('star-count').textContent='0';
 document.getElementById('game-card-content').style.display='block';
 document.getElementById('end-screen').classList.add('hidden');
-document.getElementById('game-badge').textContent=type===1?'DESAFÍO DE LA GRILLA NUMÉRICA':type===2?'DESCUBRE EL PATRÓN':'DESCUBRE EL NÚMERO QUE FALTA';
+ document.getElementById('game-screen').setAttribute('data-challenge',type);
+ document.getElementById('game-badge').textContent=type===1?'DESAFÍO DE LA GRILLA NUMÉRICA':type===2?'DESCUBRE EL PATRÓN':'DESCUBRE EL NÚMERO QUE FALTA';
 try{SoundFX.play('start')}catch(e){};
 totalTimerInterval=setInterval(updateTimers,1000);
 loadChallenge()
@@ -598,7 +610,7 @@ function updateQuestionTimerDisplay(){
 const el=document.getElementById('q-timer-text');
 el.textContent=`⏱ ${questionTimeLeft}s`;
 if(questionTimeLeft<=10){el.style.color='#ef4444';el.classList.add('urgent')}
-else{el.style.color='#6366f1';el.classList.remove('urgent')}
+else{el.style.color='';el.classList.remove('urgent')}
 }
 function handleTimeout(){
 if(answered||!gameActive)return;
