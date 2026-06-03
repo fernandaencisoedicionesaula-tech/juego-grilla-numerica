@@ -349,7 +349,7 @@ body{padding:6px}
 <button class="challenge-btn active" data-challenge="1">
 <span class="btn-num">1</span>
 <span class="btn-info">
-<span class="btn-text">DESAFÍO DE LA GRILLA NUMERICA</span>
+<span class="btn-text">DESAFÍO DE LA GRILLA NUMÉRICA</span>
 <span class="btn-desc">La grilla numérica</span>
 </span>
 </button>
@@ -380,7 +380,7 @@ body{padding:6px}
 <div class="game-header">
 <div class="header-left">
 <button class="back-btn" id="back-to-menu">🏠 VOLVER</button>
-<div><div class="game-title">Detective de los Números <span class="game-level-badge" id="game-badge">DESAFÍO DE LA GRILLA NUMERICA</span></div></div>
+<div><div class="game-title">Detective de los Números <span class="game-level-badge" id="game-badge">DESAFÍO DE LA GRILLA NUMÉRICA</span></div></div>
 </div>
 <div class="stars-display">⭐ <span id="star-count">0</span></div>
 </div>
@@ -565,7 +565,7 @@ currentChallenge=0;stars=0;gameActive=true;totalTimeLeft=TOTAL_TIME;
 document.getElementById('star-count').textContent='0';
 document.getElementById('game-card-content').style.display='block';
 document.getElementById('end-screen').classList.add('hidden');
-document.getElementById('game-badge').textContent=type===1?'DESAFÍO DE LA GRILLA NUMERICA':type===2?'DESAFÍO 2':'DESAFÍO 3';
+document.getElementById('game-badge').textContent=type===1?'DESAFÍO DE LA GRILLA NUMÉRICA':type===2?'DESAFÍO 2':'DESAFÍO 3';
 try{SoundFX.play('start')}catch(e){};
 totalTimerInterval=setInterval(updateTimers,1000);
 loadChallenge()
